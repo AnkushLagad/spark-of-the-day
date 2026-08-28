@@ -6,4 +6,4 @@ Amazon Bedrock (Claude Haiku 4.5), and displays it on a simple webpage.
 Run `python agent.py` to generate a new spark. It writes `site/latest.json`
 and archives a dated copy under `site/archive/`.
 
-Live site: https://ankushlagad.github.io/spark-of-the-day/
+
