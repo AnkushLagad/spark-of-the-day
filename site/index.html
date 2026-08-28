@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Spark of the Day</title>
+<style>
+  body { margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
+    background: linear-gradient(135deg, #1e1b4b, #312e81); font-family: Georgia, serif; color:#f5f3ff; }
+  .card { max-width:560px; padding:40px; background:rgba(255,255,255,0.06); border-radius:16px;
+    box-shadow:0 10px 40px rgba(0,0,0,0.3); text-align:center; }
+  h1 { font-size:1.2rem; letter-spacing:2px; text-transform:uppercase; color:#c4b5fd; margin-bottom:4px; }
+  .date { font-size:0.85rem; color:#a5b4fc; margin-bottom:24px; }
+  .story { font-size:1.15rem; line-height:1.6; white-space:pre-wrap; }
+  .theme { margin-top:24px; font-size:0.85rem; color:#a5b4fc; font-style:italic; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1>✨ Spark of the Day</h1>
+    <div class="date" id="date">loading...</div>
+    <div class="story" id="story">Fetching today's spark...</div>
+    <div class="theme" id="theme"></div>
+  </div>
+  <script>
+    fetch("./latest.json")
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById("date").textContent = data.date;
+        document.getElementById("story").textContent = data.story;
+        document.getElementById("theme").textContent = "theme: " + data.theme;
+      })
+      .catch(() => {
+        document.getElementById("story").textContent = "No spark yet — run agent.py first!";
+      });
+  </script>
+</body>
+</html>
