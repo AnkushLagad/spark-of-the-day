@@ -4,7 +4,7 @@ import datetime
 import os
 import boto3
 
-MODEL_ID = os.environ.get("MODEL_ID", "PASTE-CORRECT-ID-HERE")
+MODEL_ID = os.environ.get("MODEL_ID")
 
 THEMES = [
     "a lighthouse keeper who talks to ships",
@@ -18,6 +18,11 @@ THEMES = [
 ]
 
 def generate_spark():
+    if not MODEL_ID:
+        raise RuntimeError(
+            "Set MODEL_ID to an Amazon Bedrock model ID before generating a spark."
+        )
+
     bedrock = boto3.client("bedrock-runtime")
     theme = random.choice(THEMES)
     today = datetime.date.today().isoformat()

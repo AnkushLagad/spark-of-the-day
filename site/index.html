@@ -1,37 +1,504 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<title>Spark of the Day</title>
-<style>
-  body { margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
-    background: linear-gradient(135deg, #1e1b4b, #312e81); font-family: Georgia, serif; color:#f5f3ff; }
-  .card { max-width:560px; padding:40px; background:rgba(255,255,255,0.06); border-radius:16px;
-    box-shadow:0 10px 40px rgba(0,0,0,0.3); text-align:center; }
-  h1 { font-size:1.2rem; letter-spacing:2px; text-transform:uppercase; color:#c4b5fd; margin-bottom:4px; }
-  .date { font-size:0.85rem; color:#a5b4fc; margin-bottom:24px; }
-  .story { font-size:1.15rem; line-height:1.6; white-space:pre-wrap; }
-  .theme { margin-top:24px; font-size:0.85rem; color:#a5b4fc; font-style:italic; }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#080b19" />
+  <meta name="description" content="A small, daily story to make the ordinary feel a little more magical." />
+  <title>Spark of the Day</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: "DM Sans", sans-serif;
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+      --ink: #f3f1ff;
+      --muted: #a7a8c4;
+      --accent: #c2a8ff;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      min-width: 320px;
+      min-height: 100vh;
+      margin: 0;
+      overflow-x: hidden;
+      color: var(--ink);
+      background:
+        radial-gradient(ellipse at 78% 42%, rgba(91, 70, 157, 0.19), transparent 38%),
+        radial-gradient(ellipse at 15% 100%, rgba(36, 68, 113, 0.17), transparent 45%),
+        #080b19;
+    }
+
+    .scene {
+      position: fixed;
+      z-index: 0;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      min-height: 100vh;
+      flex-direction: column;
+      align-items: center;
+      padding: 32px 24px 22px;
+    }
+
+    .masthead, main, footer { width: min(100%, 980px); }
+
+    .masthead {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      color: #ded8fb;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+    }
+
+    .brand-mark {
+      display: grid;
+      width: 34px;
+      height: 34px;
+      place-items: center;
+      border: 1px solid rgba(205, 187, 255, 0.3);
+      border-radius: 50%;
+      color: var(--accent);
+      font-size: 1rem;
+    }
+
+    main {
+      display: grid;
+      flex: 1;
+      align-content: center;
+      justify-items: start;
+      padding: 68px 0 78px;
+    }
+
+    .intro { max-width: 590px; }
+
+    .eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0 0 18px;
+      color: var(--accent);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.19em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      width: 25px;
+      height: 1px;
+      background: currentColor;
+      content: "";
+    }
+
+    h1, h2, p { margin-top: 0; }
+
+    h1 {
+      max-width: 570px;
+      margin-bottom: 15px;
+      font-family: "Playfair Display", Georgia, serif;
+      font-size: clamp(3rem, 7vw, 5.65rem);
+      font-weight: 500;
+      letter-spacing: -0.055em;
+      line-height: 1.04;
+    }
+
+    h1 span {
+      color: #c5adff;
+      font-style: italic;
+      font-weight: 500;
+    }
+
+    .subtitle {
+      max-width: 440px;
+      margin-bottom: 34px;
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.7;
+    }
+
+    .story-card {
+      width: min(100%, 650px);
+      padding: clamp(24px, 5vw, 40px);
+      border: 1px solid rgba(210, 205, 255, 0.14);
+      border-radius: 22px;
+      background: linear-gradient(135deg, rgba(25, 27, 52, 0.8), rgba(16, 19, 39, 0.7));
+      box-shadow: 0 26px 90px rgba(0, 0, 0, 0.28), inset 0 1px rgba(255, 255, 255, 0.04);
+      -webkit-backdrop-filter: blur(16px);
+      backdrop-filter: blur(16px);
+    }
+
+    .story-meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 27px;
+    }
+
+    .date, .daily-label {
+      color: #b3b1d0;
+      font-size: 0.77rem;
+      letter-spacing: 0.06em;
+    }
+
+    .daily-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #d6ccf6;
+      text-transform: uppercase;
+    }
+
+    .daily-label::before {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #a78bfa;
+      box-shadow: 0 0 12px rgba(167, 139, 250, 0.8);
+      content: "";
+    }
+
+    .story-content {
+      min-height: 160px;
+      color: #e5e3f2;
+      font-family: "Playfair Display", Georgia, serif;
+      font-size: clamp(1.05rem, 2vw, 1.2rem);
+      line-height: 1.85;
+      overflow-wrap: anywhere;
+    }
+
+    .story-content p { margin-bottom: 1.1em; }
+    .story-content p:last-child { margin-bottom: 0; }
+
+    .story-content h2 {
+      margin-bottom: 0.75em;
+      color: #fff;
+      font-size: 1.55em;
+      line-height: 1.25;
+    }
+
+    .story-content em { color: #d2c2ff; }
+
+    .theme {
+      display: flex;
+      align-items: baseline;
+      gap: 9px;
+      margin: 28px 0 0;
+      padding-top: 19px;
+      border-top: 1px solid rgba(210, 205, 255, 0.12);
+      color: #b9b4d7;
+      font-size: 0.83rem;
+      line-height: 1.55;
+    }
+
+    .theme-label {
+      flex: 0 0 auto;
+      color: #a995e8;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .theme[hidden] { display: none; }
+
+    footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      color: #797c9b;
+      font-size: 0.72rem;
+    }
+
+    footer span:last-child { text-align: right; }
+
+    @media (max-width: 600px) {
+      .page { padding: 22px 18px 18px; }
+      main { padding: 55px 0; }
+      .subtitle { margin-bottom: 26px; }
+      .story-card { border-radius: 18px; }
+      .story-content { min-height: 130px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
 </head>
 <body>
-  <div class="card">
-    <h1>✨ Spark of the Day</h1>
-    <div class="date" id="date">loading...</div>
-    <div class="story" id="story">Fetching today's spark...</div>
-    <div class="theme" id="theme"></div>
+  <canvas class="scene" id="scene" aria-hidden="true"></canvas>
+  <div class="page">
+    <header class="masthead">
+      <span class="brand-mark" aria-hidden="true">✳</span>
+      <span>A small daily ritual</span>
+    </header>
+
+    <main>
+      <section class="intro" aria-labelledby="page-title">
+        <p class="eyebrow">A little wonder, every day</p>
+        <h1 id="page-title">A spark for your <span>imagination.</span></h1>
+        <p class="subtitle">One tiny story, dreamed up for today. Take a breath, settle in, and see where it takes you.</p>
+      </section>
+
+      <article class="story-card" aria-label="Today's story">
+        <div class="story-meta">
+          <time class="date" id="date">Finding today's date…</time>
+          <span class="daily-label">Today's spark</span>
+        </div>
+        <div class="story-content" id="story" aria-live="polite" aria-busy="true">
+          <p>Gathering a little wonder for you…</p>
+        </div>
+        <p class="theme" id="theme" hidden>
+          <span class="theme-label">Inspired by</span>
+          <span id="theme-text"></span>
+        </p>
+      </article>
+    </main>
+
+    <footer>
+      <span>Made for the moments in between.</span>
+      <span>Stories are generated with a little help from AI.</span>
+    </footer>
   </div>
-  <script>
-    fetch("./latest.json")
-      .then(res => res.json())
-      .then(data => {
-        document.getElementById("date").textContent = data.date;
-        document.getElementById("story").textContent = data.story;
-        document.getElementById("theme").textContent = "theme: " + data.theme;
-      })
-      .catch(() => {
-        document.getElementById("story").textContent = "No spark yet — run agent.py first!";
-      });
+
+  <script type="module">
+    const storyElement = document.getElementById("story");
+    const dateElement = document.getElementById("date");
+    const themeElement = document.getElementById("theme");
+    const themeTextElement = document.getElementById("theme-text");
+
+    function appendInlineText(container, text) {
+      const emphasisPattern = /\*([^*]+)\*/g;
+      let lastIndex = 0;
+      let match;
+
+      while ((match = emphasisPattern.exec(text)) !== null) {
+        container.append(document.createTextNode(text.slice(lastIndex, match.index)));
+        const emphasis = document.createElement("em");
+        emphasis.textContent = match[1];
+        container.append(emphasis);
+        lastIndex = emphasisPattern.lastIndex;
+      }
+
+      container.append(document.createTextNode(text.slice(lastIndex)));
+    }
+
+    function renderStory(text) {
+      storyElement.replaceChildren();
+      let paragraphLines = [];
+
+      function flushParagraph() {
+        if (paragraphLines.length === 0) return;
+        const paragraph = document.createElement("p");
+        appendInlineText(paragraph, paragraphLines.join(" "));
+        storyElement.append(paragraph);
+        paragraphLines = [];
+      }
+
+      for (const line of text.split(/\r?\n/)) {
+        const trimmedLine = line.trim();
+        if (!trimmedLine) {
+          flushParagraph();
+        } else if (trimmedLine.startsWith("# ")) {
+          flushParagraph();
+          const heading = document.createElement("h2");
+          heading.textContent = trimmedLine.slice(2);
+          storyElement.append(heading);
+        } else {
+          paragraphLines.push(trimmedLine);
+        }
+      }
+
+      flushParagraph();
+    }
+
+    async function loadSpark() {
+      try {
+        const response = await fetch("./latest.json");
+        if (!response.ok) {
+          throw new Error(`Spark data request failed (${response.status}).`);
+        }
+
+        const data = await response.json();
+        if (
+          typeof data.date !== "string" ||
+          typeof data.theme !== "string" ||
+          typeof data.story !== "string" ||
+          !data.story.trim()
+        ) {
+          throw new Error("Spark data is missing a date, theme, or story.");
+        }
+
+        const parsedDate = new Date(`${data.date}T12:00:00`);
+        if (Number.isNaN(parsedDate.getTime())) {
+          throw new Error("Spark data contains an invalid date.");
+        }
+
+        dateElement.dateTime = data.date;
+        dateElement.textContent = new Intl.DateTimeFormat("en", {
+          month: "long",
+          day: "numeric",
+          year: "numeric",
+        }).format(parsedDate);
+        renderStory(data.story);
+        themeTextElement.textContent = data.theme;
+        themeElement.hidden = false;
+      } catch (error) {
+        console.error("Unable to load today's spark:", error);
+        dateElement.textContent = "Today's story";
+        storyElement.replaceChildren();
+        const message = document.createElement("p");
+        message.textContent = "We couldn't find today's spark. Run agent.py to create one, then refresh this page.";
+        storyElement.append(message);
+      } finally {
+        storyElement.setAttribute("aria-busy", "false");
+      }
+    }
+
+    function startScene() {
+      const canvas = document.getElementById("scene");
+      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      import("https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js")
+        .then(({ AmbientLight, AdditiveBlending, BufferGeometry, Color, Float32BufferAttribute, Group, Mesh, MeshBasicMaterial, PerspectiveCamera, Points, PointsMaterial, Scene, SphereGeometry, TorusGeometry, WebGLRenderer }) => {
+          const scene = new Scene();
+          const camera = new PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 100);
+          camera.position.z = 15;
+
+          const renderer = new WebGLRenderer({
+            canvas,
+            alpha: true,
+            antialias: true,
+            powerPreference: "low-power",
+          });
+          renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+          renderer.setSize(window.innerWidth, window.innerHeight);
+          renderer.setClearColor(0x000000, 0);
+
+          scene.add(new AmbientLight(0xbab1ff, 1.5));
+          const orb = new Group();
+          orb.position.set(5.9, 0.15, -3.5);
+          scene.add(orb);
+
+          const planet = new Mesh(
+            new SphereGeometry(2.55, 48, 32),
+            new MeshBasicMaterial({
+              color: 0x7662bd,
+              wireframe: true,
+              transparent: true,
+              opacity: 0.3,
+            }),
+          );
+          orb.add(planet);
+
+          const innerGlow = new Mesh(
+            new SphereGeometry(2.48, 32, 24),
+            new MeshBasicMaterial({
+              color: 0x302858,
+              transparent: true,
+              opacity: 0.17,
+            }),
+          );
+          orb.add(innerGlow);
+
+          const ring = new Mesh(
+            new TorusGeometry(3.45, 0.012, 4, 140),
+            new MeshBasicMaterial({
+              color: 0xb7a0ff,
+              transparent: true,
+              opacity: 0.65,
+            }),
+          );
+          ring.rotation.set(0.95, 0.2, -0.28);
+          orb.add(ring);
+
+          const starPositions = [];
+          for (let index = 0; index < 1250; index += 1) {
+            starPositions.push(
+              (Math.random() - 0.5) * 44,
+              (Math.random() - 0.5) * 30,
+              (Math.random() - 0.5) * 28 - 5,
+            );
+          }
+          const starGeometry = new BufferGeometry();
+          starGeometry.setAttribute("position", new Float32BufferAttribute(starPositions, 3));
+          const stars = new Points(
+            starGeometry,
+            new PointsMaterial({
+              color: new Color(0xd7d0ff),
+              size: 0.035,
+              transparent: true,
+              opacity: 0.75,
+              sizeAttenuation: true,
+              blending: AdditiveBlending,
+              depthWrite: false,
+            }),
+          );
+          scene.add(stars);
+
+          const pointer = { x: 0, y: 0 };
+          if (!reducedMotion) {
+            window.addEventListener("pointermove", (event) => {
+              pointer.x = (event.clientX / window.innerWidth - 0.5) * 0.24;
+              pointer.y = (event.clientY / window.innerHeight - 0.5) * 0.16;
+            }, { passive: true });
+          }
+
+          function resize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.position.z = window.innerWidth < 600 ? 18 : 15;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.render(scene, camera);
+          }
+          window.addEventListener("resize", resize, { passive: true });
+
+          if (reducedMotion) {
+            renderer.render(scene, camera);
+            return;
+          }
+
+          renderer.setAnimationLoop((time) => {
+            orb.rotation.y = time * 0.00008;
+            orb.rotation.x = Math.sin(time * 0.00012) * 0.035;
+            stars.rotation.y = time * 0.000006;
+            camera.position.x += (pointer.x - camera.position.x) * 0.015;
+            camera.position.y += (-pointer.y - camera.position.y) * 0.015;
+            camera.lookAt(0, 0, 0);
+            renderer.render(scene, camera);
+          });
+        })
+        .catch((error) => {
+          console.warn("The decorative Three.js scene is unavailable.", error);
+        });
+    }
+
+    loadSpark();
+    startScene();
   </script>
 </body>
 </html>
